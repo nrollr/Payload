@@ -13,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="assets/css/bootstrap-select.css">
     <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/custom.css">
 </head>
 
 <body>
@@ -45,7 +46,7 @@
 		<p class="lead">Basic interface to generate <strong>sensor data</strong>
 		<a href="index.php" id="refresh"><sup><i class="fa fa-refresh"></i></sup></a></p>
 	</div>
-  
+	<div class="top">  
   	<div class="row">
   	<form method="post" action="index.php" role="form" id="data">
 	<div class="col-md-4">
@@ -82,6 +83,7 @@
 		<div id="info"></div>
 	</div>
   	</form>	
+	</div>
 	</div>
  	<!-- End Input section -->
 
