@@ -1,152 +1,132 @@
 
-<?php include ('include/db_connect.php'); ?>
+<?php
+	include ("include/db_connect.php");
+	$warning = '<div class="ui negative message"><i class="close icon"></i><div class="header">Warning!</div><p>A required field is missing, please try again!</p></div>';
+?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap-select.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/custom.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.css">
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
-<?php 
+<br>
+<div class="ui grid">
+<div class="five wide column"></div>
+<div class="six wide column">
+<?php
 	if($_POST['submit'] == 1) {
 		if($_POST['sensor_id'] == '') {
 			echo ''.$warning.'';
 			$error = true;
 		}
-		if($_POST['time'] == '') {
-			echo ''.$warning.'';
-			$error = true;
-		}
-		if($_POST['volume'] == '') {
+		elseif($_POST['volume'] == '') {
 			echo ''.$warning.'';
 			$error = true;
 		}
 		if($error != true) {
-	
 	$query = "INSERT INTO Data (sensor_id, time, volume) VALUES ('$_POST[sensor_id]', '$_POST[time]', '$_POST[volume]')";
-	$result = mysqli_query($db, $query); 
+	$result = mysqli_query($db, $query);
 		}
 	}
 ?>
-<!-- Begin Container -->
-<div class="container"> 
-
-	<!-- Begin Input section -->
-	<div class="page-header">
-		<p class="lead">Basic interface to generate <strong>sensor data</strong>
-		<a href="index.php" id="refresh"><sup><i class="fa fa-refresh"></i></sup></a></p>
+<br>
+<h1 class="ui dividing header">Payload generator
+	<div class="sub header">
+		Basic interface to generate <strong>sensor data</strong>&nbsp;
+		<a href="index.php"><i class="sync alternate icon grey"></i></a>
 	</div>
-	<div class="top">  
-  	<div class="row">
-  	<form method="post" action="index.php" role="form" id="data">
-	<div class="col-md-4">
-		<p>Select <b>sensor</b> :</p>
-		
-			<?php
-			//header("Content-type: text/html; charset=utf-8");
-			 
-			$sql = "SELECT * FROM Sensors";
-			$query = mysqli_query($db, $sql);
-				echo '<select onchange="showClient(this.value)" id="dropdown" class="selectpicker" data-width="100%">';
-				echo '<option value="">Available Sensors</option>';
-					while($sensor = mysqli_fetch_assoc($query)){
-					echo "<option value='" . $sensor['client_id'] ."'>" . $sensor['sensor_id'] . "</option>";
-					}
-				echo '</select>';
-			?>
-		</br>
-		</br>
-			<?php 
-				$date = date_create();
-				$stamp = date_timestamp_get($date);
-			?>
-		<input type="hidden" id="time" name="time" value="<?php echo ''.$stamp.''; ?>" />
-		<div class="row">
-			<div class="col-md-12">
-				<input class="form-control" type="text" id="volume" name="volume" placeholder="Enter flowmeter value"/></br>
-				<button name="submit" type="submit" class="btn btn-default" value="1">Generate payload</button>
+</h1>
+	<form method="POST" action="index.php" class="ui form">
+	<div class="ui grid">
+		<div class="six wide column">
+			<p>Select <b>sensor</b> :</p>
+			<div class="field">
+				<select name="Folder" class="ui fluid dropdown" onchange="showClient(this.value)">
+					<option value="">Available Sensors</option>
+					<?php
+					$sql = "SELECT * FROM Sensors";
+					$query = mysqli_query($db, $sql);
+						while($sensor = mysqli_fetch_assoc($query)){
+						echo "<option value='" . $sensor['client_id'] ."'>" . $sensor['sensor_id'] . "</option>";
+						};
+					$date = date_create();
+					$timestamp = date_timestamp_get($date);
+					?>
+				</select>
+				<input type="hidden" name="time" value="<?php echo ''.$timestamp.'';?>">
 			</div>
-		</div>		
+			<div class="field">
+				<input type="text" name="volume" placeholder="Enter flowmeter value"><br><br>
+				<button class="ui basic button" name="submit" type="submit" value="1">Generate payload</button>
+			</div>
+		</div>
+		<div class="ten wide column" id="info"></div>
 	</div>
-
-	<div class="col-md-4 col-md-offset-4">
-		<div id="info"></div>
-	</div>
-  	</form>	
-	</div>
-	</div>
- 	<!-- End Input section -->
-
-  <!-- Begin Output section -->	
-  
-  <div class="footer">
-  	<div class="row">
-	<div class="col-md-9">
-  	<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Sensor ID</th>
-            <th>Timestamp</th>
-            <th>Flowmeter output</th>
-        </tr>
-    </thead>
-    <tbody>    
-		<?php 
+	</form>
+<br>
+<br>
+<br>
+<br>
+<br>
+<table class="ui celled striped very compact table">
+	<thead>
+		<tr>
+			<th class="">Sensor ID</th>
+			<th class="">Timestamp</th>
+			<th class="collapsing center aligned">Recorded value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
 		$sql = "SELECT * FROM Data";
 		$query = mysqli_query($db, $sql);
-				while($rawdata = mysqli_fetch_assoc($query)){
-				echo "<tr><td>". $rawdata['sensor_id'] ."</td><td>". $rawdata['time'] ."</td><td>". $rawdata['volume'] ."</td></tr>";
-				}
+			while($rawdata = mysqli_fetch_assoc($query)){
+			echo "<tr>";
+			echo "<td class=''>".$rawdata['sensor_id']."</td>";
+			echo "<td class=''>".$rawdata['time']."</td>";
+			echo "<td class='disabled collapsing center aligned'>".$rawdata['volume']."</td>";
+			echo "</tr>";
+			}
 		?>
-	</tbody>	
-	</table>
-	</div>	
-	</div>	
-  </div>	
-  <!-- End Output section -->
-
+	</tbody>
+</table>
 </div>
-<!-- End Container -->
-	<script type="text/javascript" src="assets/javascript/jquery.js"></script>
-	<script type="text/javascript" src="assets/javascript/bootstrap.js"></script>
-	<script type="text/javascript" src="assets/javascript/bootstrap-select.js"></script>
-
-	<script language="javascript"> $('.selectpicker').selectpicker('refresh'); </script> 
-	<script language="javascript">
-	function showClient(str)
-		{ if (str=="")
-	  		{document.getElementById("info").innerHTML="";
-		  	return;}
-		if (window.XMLHttpRequest)
-	  		{xmlhttp=new XMLHttpRequest();}
-		else
-	  		{xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");}
-			xmlhttp.onreadystatechange=function()
-			  {if (xmlhttp.readyState==4 && xmlhttp.status==200)
-	    		{document.getElementById("info").innerHTML=xmlhttp.responseText;}}
+<div class="five wide column"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.js"></script>
+<script type="text/javascript">
+$('.ui.dropdown').dropdown();
+$('.message .close').on('click', function() {
+	$(this).closest('.message').transition('fade');
+});
+</script>
+<script type="text/javascript">
+	function showClient(str){
+		if (str==""){
+			document.getElementById("info").innerHTML="";
+			return;
+		}
+		if (window.XMLHttpRequest){
+			xmlhttp=new XMLHttpRequest();
+		}
+		else {
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+			xmlhttp.onreadystatechange=function(){
+				if (xmlhttp.readyState==4 && xmlhttp.status==200){
+					document.getElementById("info").innerHTML=xmlhttp.responseText;
+				}
+			}
 			xmlhttp.open("GET","include/client.php?qry="+str,true);
 			xmlhttp.send();
-		}
-	</script>
-
-	<script language="javascript">
-	$(window).load(function(){
-	$(document).ready(function(){
-	    $('#refresh').click(function(){
-	        $('#dropdown').prop('selectedIndex',0);
-	    	})
-		});
-	}); 
-	</script>
+	}
+</script>
 </body>
 </html>
