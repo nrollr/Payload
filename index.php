@@ -20,18 +20,16 @@
 <div class="five wide column"></div>
 <div class="six wide column">
 <?php
-	if($_POST['submit'] == 1) {
-		if($_POST['sensor_id'] == '') {
+	if(isset($_POST['submit']) && $_POST['submit'] == 1) {
+		if(isset($_POST['sensor_id']) && $_POST['sensor_id'] == '') {
 			echo ''.$warning.'';
-			$error = true;
-		}
-		elseif($_POST['volume'] == '') {
+		}	
+		elseif(isset($_POST['volume']) && $_POST['volume'] == '') {
 			echo ''.$warning.'';
-			$error = true;
 		}
-		if($error != true) {
-	$query = "INSERT INTO Data (sensor_id, time, volume) VALUES ('$_POST[sensor_id]', '$_POST[time]', '$_POST[volume]')";
-	$result = mysqli_query($db, $query);
+		else {
+			$query = "INSERT INTO Data (sensor_id, time, volume) VALUES ('$_POST[sensor_id]', '$_POST[time]', '$_POST[volume]')";
+			$result = mysqli_query($db, $query);
 		}
 	}
 ?>
